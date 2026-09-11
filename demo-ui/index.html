@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>K4 LLM Lab Console</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Bỏ qua tới nội dung chính</a>
+    <header class="app-header" aria-label="Thanh tiêu đề">
+      <div>
+        <p class="eyebrow">K4 Day 01</p>
+        <h1>LLM Lab Console</h1>
+      </div>
+      <div class="header-meter" aria-label="Trạng thái demo">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Mock streaming</span>
+      </div>
+    </header>
+
+    <main id="main" class="shell">
+      <section class="workspace" aria-label="Bảng điều khiển demo">
+        <form class="control-panel" id="chatForm">
+          <div class="panel-heading">
+            <p class="eyebrow">Request builder</p>
+            <h2>Prompt, persona, sampling</h2>
+          </div>
+
+          <label class="field">
+            <span>System prompt</span>
+            <textarea id="persona" rows="4">Bạn là trợ giảng thân thiện của khóa AI, trả lời ngắn gọn bằng tiếng Việt.</textarea>
+          </label>
+
+          <label class="field">
+            <span>User prompt</span>
+            <textarea id="prompt" rows="4">Giải thích streaming trong LLM bằng một ví dụ đời thường.</textarea>
+          </label>
+
+          <div class="slider-grid">
+            <label class="range-field">
+              <span>Temperature</span>
+              <strong id="temperatureValue">0.7</strong>
+              <input id="temperature" type="range" min="0" max="2" step="0.1" value="0.7" />
+            </label>
+            <label class="range-field">
+              <span>Top-p</span>
+              <strong id="topPValue">0.9</strong>
+              <input id="topP" type="range" min="0.1" max="1" step="0.1" value="0.9" />
+            </label>
+            <label class="range-field">
+              <span>Max tokens</span>
+              <strong id="maxTokensValue">256</strong>
+              <input id="maxTokens" type="range" min="64" max="512" step="32" value="256" />
+            </label>
+          </div>
+
+          <div class="button-row">
+            <button class="primary-button" type="submit">Stream reply</button>
+            <button class="ghost-button" id="compareButton" type="button">Compare models</button>
+            <button class="quiet-button" id="resetButton" type="button">Reset</button>
+          </div>
+        </form>
+
+        <section class="chat-panel" aria-label="Kết quả hội thoại">
+          <div class="panel-heading chat-heading">
+            <div>
+              <p class="eyebrow">Assistant output</p>
+              <h2>Conversation</h2>
+            </div>
+            <span class="turn-pill"><span id="turnCount">0</span> turns</span>
+          </div>
+
+          <div class="chat-feed" id="chatFeed" aria-live="polite"></div>
+
+          <div class="stats-grid" aria-label="Thống kê phiên chat">
+            <div>
+              <span>Total tokens</span>
+              <strong id="totalTokens">0</strong>
+            </div>
+            <div>
+              <span>Estimated cost</span>
+              <strong id="totalCost">$0.000000</strong>
+            </div>
+            <div>
+              <span>History kept</span>
+              <strong id="historyKept">0 / 6</strong>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="insight-grid" aria-label="Luồng xử lý và so sánh model">
+        <article class="flow-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Message stack</p>
+            <h2>Request flow</h2>
+          </div>
+          <ol class="message-stack" id="messageStack"></ol>
+        </article>
+
+        <article class="signal-panel">
+          <canvas id="signalCanvas" width="880" height="320" role="img" aria-label="Dòng token streaming từ request tới phản hồi"></canvas>
+          <div class="pipeline-labels" aria-hidden="true">
+            <span>Input</span>
+            <span>LLM</span>
+            <span>Stream</span>
+            <span>Stats</span>
+          </div>
+        </article>
+
+        <article class="compare-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Model comparison</p>
+            <h2>Latency and output</h2>
+          </div>
+          <div class="comparison-table" role="table" aria-label="So sánh model">
+            <div role="row" class="table-head">
+              <span role="columnheader">Model</span>
+              <span role="columnheader">Latency</span>
+              <span role="columnheader">Cost</span>
+              <span role="columnheader">Response</span>
+            </div>
+            <div id="comparisonRows"></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
