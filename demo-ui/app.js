@@ -19,6 +19,8 @@ const messageStack = document.querySelector("#messageStack");
 const comparisonRows = document.querySelector("#comparisonRows");
 const compareButton = document.querySelector("#compareButton");
 const resetButton = document.querySelector("#resetButton");
+const runtimeStatus = document.querySelector("#runtimeStatus");
+const statusDot = document.querySelector(".status-dot");
 const sliders = [
   ["temperature", "temperatureValue"],
   ["topP", "topPValue"],
@@ -61,12 +63,37 @@ function buildReply(prompt, persona) {
   return `Mình sẽ trả lời ${tone}: "${prompt}" được gửi kèm system prompt, history gần nhất và tham số sampling. Với demo này, phản hồi được tách thành nhiều chunk để bạn thấy streaming xuất hiện dần, sau đó history chỉ giữ 3 lượt cuối. Cách triển khai nên ${style}.`;
 }
 
-async function requestReply(prompt, persona) {
+function renderRuntimeStatus(label, mode = "mock") {
+  runtimeStatus.textContent = label;
+  statusDot.dataset.mode = mode;
+}
+
+async function loadRuntimeConfig() {
   if (window.location.protocol === "file:") {
+    renderRuntimeStatus("File mock mode", "mock");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/config");
+    const payload = await response.json();
+    renderRuntimeStatus(
+      payload.hasKey ? `Real API ready: ${payload.model}` : "Server mock mode",
+      payload.hasKey ? "api" : "mock",
+    );
+  } catch {
+    renderRuntimeStatus("Browser mock mode", "mock");
+  }
+}
+
+async function requestReplyStream(prompt, persona, target) {
+  if (window.location.protocol === "file:") {
+    const reply = buildReply(prompt, persona);
+    await streamText(target, reply);
     return {
-      reply: buildReply(prompt, persona),
+      reply,
       source: "mock-file",
-      ...estimateCost(prompt, buildReply(prompt, persona)),
+      ...estimateCost(prompt, reply),
     };
   }
 
@@ -85,21 +112,59 @@ async function requestReply(prompt, persona) {
     });
 
     if (!response.ok) throw new Error("Request failed");
-    const payload = await response.json();
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let reply = "";
+    let stats = null;
+    state.isStreaming = true;
+    form.querySelector(".primary-button").disabled = true;
+    target.textContent = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split("\n\n");
+      buffer = events.pop();
+
+      for (const event of events) {
+        const line = event.split("\n").find((part) => part.startsWith("data: "));
+        if (!line) continue;
+        const payload = JSON.parse(line.slice(6));
+        if (payload.type === "delta") {
+          reply += payload.text;
+          target.textContent = reply;
+          chatFeed.scrollTop = chatFeed.scrollHeight;
+        }
+        if (payload.type === "done") {
+          stats = payload;
+        }
+      }
+    }
+
+    form.querySelector(".primary-button").disabled = false;
+    state.isStreaming = false;
+
+    if (!stats) throw new Error("Missing stream stats");
+    renderRuntimeStatus(stats.source === "api" ? "Real API streaming" : "Mock fallback", stats.source === "api" ? "api" : "mock");
     return {
-      reply: payload.reply,
-      source: payload.source,
-      inputTokens: payload.inputTokens,
-      outputTokens: payload.outputTokens,
-      totalCost: payload.totalCost,
+      reply,
+      source: stats.source,
+      inputTokens: stats.inputTokens,
+      outputTokens: stats.outputTokens,
+      totalCost: stats.totalCost,
     };
   } catch {
     const reply = buildReply(prompt, persona);
-    return {
+    await streamText(target, reply);
+    const result = {
       reply,
       source: "mock-browser",
       ...estimateCost(prompt, reply),
     };
+    renderRuntimeStatus("Browser mock fallback", "mock");
+    return result;
   }
 }
 
@@ -173,10 +238,9 @@ async function handleSend(event) {
   addMessage("user", prompt);
   renderStack(persona, prompt);
 
-  const result = await requestReply(prompt, persona);
-  const reply = result.reply;
   const target = addMessage("assistant", "");
-  await streamText(target, reply);
+  const result = await requestReplyStream(prompt, persona, target);
+  const reply = result.reply;
 
   state.history.push({ role: "user", content: prompt });
   state.history.push({ role: "assistant", content: reply });
@@ -222,6 +286,50 @@ function renderComparison() {
     item.querySelector("span:last-child").textContent = row.response;
     comparisonRows.appendChild(item);
   });
+}
+
+async function compareModels() {
+  const prompt = promptInput.value.trim() || "Giải thích token là gì.";
+  if (window.location.protocol === "file:") {
+    renderComparison();
+    return;
+  }
+
+  compareButton.disabled = true;
+  try {
+    const response = await fetch("/api/compare", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt,
+        temperature: Number(document.querySelector("#temperature").value),
+        topP: Number(document.querySelector("#topP").value),
+        maxTokens: Number(document.querySelector("#maxTokens").value),
+      }),
+    });
+    if (!response.ok) throw new Error("Compare failed");
+    const payload = await response.json();
+    comparisonRows.innerHTML = "";
+    payload.rows.forEach((row) => {
+      const item = document.createElement("div");
+      item.className = "comparison-row";
+      item.setAttribute("role", "row");
+      item.innerHTML = `
+        <span role="cell">${row.model}</span>
+        <span role="cell">${row.latency.toFixed(2)}s</span>
+        <span role="cell">$${row.cost.toFixed(6)}</span>
+        <span role="cell"></span>
+      `;
+      item.querySelector("span:last-child").textContent = row.response;
+      comparisonRows.appendChild(item);
+    });
+    renderRuntimeStatus(payload.source === "api" ? "Real compare complete" : "Mock compare fallback", payload.source === "api" ? "api" : "mock");
+  } catch {
+    renderComparison();
+    renderRuntimeStatus("Compare mock fallback", "mock");
+  } finally {
+    compareButton.disabled = false;
+  }
 }
 
 function resetDemo() {
@@ -291,7 +399,7 @@ function drawSignal() {
 }
 
 form.addEventListener("submit", handleSend);
-compareButton.addEventListener("click", renderComparison);
+compareButton.addEventListener("click", compareModels);
 resetButton.addEventListener("click", resetDemo);
 personaInput.addEventListener("input", () => renderStack(personaInput.value.trim()));
 promptInput.addEventListener("input", renderComparison);
@@ -299,4 +407,5 @@ promptInput.addEventListener("input", renderComparison);
 renderStats();
 renderStack(personaInput.value.trim());
 renderComparison();
+loadRuntimeConfig();
 drawSignal();

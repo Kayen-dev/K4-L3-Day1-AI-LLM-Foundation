@@ -15,7 +15,7 @@
       </div>
       <div class="header-meter" aria-label="Trạng thái demo">
         <span class="status-dot" aria-hidden="true"></span>
-        <span>Mock streaming</span>
+        <span id="runtimeStatus">Checking runtime</span>
       </div>
     </header>
 
@@ -91,6 +91,31 @@
       </section>
 
       <section class="insight-grid" aria-label="Luồng xử lý và so sánh model">
+        <article class="briefing-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Demo briefing</p>
+            <h2>What to show first</h2>
+          </div>
+          <div class="briefing-grid">
+            <div>
+              <b>1. Config</b>
+              <span>Run server, load .env, choose model pair, never expose API key.</span>
+            </div>
+            <div>
+              <b>2. Prompting</b>
+              <span>System prompt sets behavior; user prompt is the current task.</span>
+            </div>
+            <div>
+              <b>3. Streaming</b>
+              <span>Tokens appear as they arrive, then stats and history update.</span>
+            </div>
+            <div>
+              <b>4. Compare</b>
+              <span>Use the same prompt to compare latency, cost and output quality.</span>
+            </div>
+          </div>
+        </article>
+
         <article class="flow-panel">
           <div class="panel-heading">
             <p class="eyebrow">Message stack</p>
@@ -123,6 +148,36 @@
             </div>
             <div id="comparisonRows"></div>
           </div>
+        </article>
+
+        <article class="setup-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Real demo setup</p>
+            <h2>Config and sharing checklist</h2>
+          </div>
+          <div class="setup-grid">
+            <code>copy .env.example .env</code>
+            <code>OPENAI_API_KEY=...</code>
+            <code>LAB_MODEL=gpt-4o</code>
+            <code>LAB_MINI_MODEL=gpt-4o-mini</code>
+            <code>.\.venv\Scripts\python.exe demo-ui\server.py</code>
+            <code>http://127.0.0.1:8000</code>
+          </div>
+          <p class="setup-note">When sharing to the class, push code only. Keep .env local and verify Git does not stage it.</p>
+        </article>
+
+        <article class="talk-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Talk track</p>
+            <h2>5 minute presentation flow</h2>
+          </div>
+          <ol class="talk-list">
+            <li>Start from config: API key lives in .env, model names can be swapped without code edits.</li>
+            <li>Show system prompt versus user prompt, then explain the exact message stack sent to the model.</li>
+            <li>Move temperature and top-p once, explain that both affect sampling, but experiments should isolate one variable.</li>
+            <li>Click Stream reply and point out time-to-first-text, running token count, cost and 3-turn history.</li>
+            <li>Click Compare models and discuss quality, latency and cost tradeoff for product decisions.</li>
+          </ol>
         </article>
       </section>
     </main>
