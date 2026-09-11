@@ -76,28 +76,28 @@ Use these prompts:
 
 ```text
 System prompt:
-Bạn là trợ giảng thân thiện của khóa AI, trả lời ngắn gọn bằng tiếng Việt.
+You are a friendly AI lab teaching assistant. Answer clearly, concisely, and in English.
 
 User prompt 1:
-Giải thích API là gì bằng ví dụ app thời tiết.
+Explain what an API is using a weather app example.
 
 User prompt 2:
-Vậy trong ví dụ đó, request và response là gì?
+In that example, what are the request and the response?
 
 Compare prompt:
-Giải thích khác biệt giữa temperature và top_p trong một câu.
+Explain the difference between temperature and top_p in one sentence.
 ```
 
 What to say while streaming:
 
 ```text
-Ở đây UI không chờ toàn bộ câu trả lời xong. Server nhận chunk từ model rồi chuyển từng chunk về browser. Người dùng đọc được ngay, nên cảm giác nhanh hơn dù tổng thời gian sinh có thể không giảm nhiều.
+The UI does not wait for the full answer to finish. The server receives chunks from the model and forwards them to the browser. Users can start reading immediately, so the experience feels faster even if the total generation time is similar.
 ```
 
 What to say while comparing:
 
 ```text
-Cùng một prompt nhưng model lớn thường trả lời sâu hơn và tốn hơn. Model nhỏ thường nhanh và rẻ hơn, hợp với FAQ, phân loại intent, hoặc demo số lượng lớn. Với tác vụ cần suy luận nhiều bước hoặc câu trả lời chất lượng cao, model lớn đáng cân nhắc.
+The same prompt can produce different tradeoffs. The larger model often gives deeper answers and costs more. The smaller model is usually faster and cheaper, which fits FAQ, intent classification, or high-volume demos. For multi-step reasoning or high-quality responses, the larger model can be worth the cost.
 ```
 
 ## 4. Sharing Checklist

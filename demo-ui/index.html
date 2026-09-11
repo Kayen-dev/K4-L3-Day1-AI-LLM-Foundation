@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,20 +7,20 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Bỏ qua tới nội dung chính</a>
-    <header class="app-header" aria-label="Thanh tiêu đề">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="app-header" aria-label="Header">
       <div>
         <p class="eyebrow">K4 Day 01</p>
         <h1>LLM Lab Console</h1>
       </div>
-      <div class="header-meter" aria-label="Trạng thái demo">
+      <div class="header-meter" aria-label="Demo runtime status">
         <span class="status-dot" aria-hidden="true"></span>
         <span id="runtimeStatus">Checking runtime</span>
       </div>
     </header>
 
     <main id="main" class="shell">
-      <section class="workspace" aria-label="Bảng điều khiển demo">
+      <section class="workspace" aria-label="Demo control panel">
         <form class="control-panel" id="chatForm">
           <div class="panel-heading">
             <p class="eyebrow">Request builder</p>
@@ -29,12 +29,12 @@
 
           <label class="field">
             <span>System prompt</span>
-            <textarea id="persona" rows="4">Bạn là trợ giảng thân thiện của khóa AI, trả lời ngắn gọn bằng tiếng Việt.</textarea>
+            <textarea id="persona" rows="4">You are a friendly AI lab teaching assistant. Answer clearly, concisely, and in English.</textarea>
           </label>
 
           <label class="field">
             <span>User prompt</span>
-            <textarea id="prompt" rows="4">Giải thích streaming trong LLM bằng một ví dụ đời thường.</textarea>
+            <textarea id="prompt" rows="4">Explain LLM streaming using a simple real-life analogy.</textarea>
           </label>
 
           <div class="slider-grid">
@@ -62,7 +62,7 @@
           </div>
         </form>
 
-        <section class="chat-panel" aria-label="Kết quả hội thoại">
+        <section class="chat-panel" aria-label="Conversation output">
           <div class="panel-heading chat-heading">
             <div>
               <p class="eyebrow">Assistant output</p>
@@ -73,7 +73,7 @@
 
           <div class="chat-feed" id="chatFeed" aria-live="polite"></div>
 
-          <div class="stats-grid" aria-label="Thống kê phiên chat">
+          <div class="stats-grid" aria-label="Session statistics">
             <div>
               <span>Total tokens</span>
               <strong id="totalTokens">0</strong>
@@ -90,7 +90,7 @@
         </section>
       </section>
 
-      <section class="insight-grid" aria-label="Luồng xử lý và so sánh model">
+      <section class="insight-grid" aria-label="Request flow and model comparison">
         <article class="briefing-panel">
           <div class="panel-heading">
             <p class="eyebrow">Demo briefing</p>
@@ -125,7 +125,7 @@
         </article>
 
         <article class="signal-panel">
-          <canvas id="signalCanvas" width="880" height="320" role="img" aria-label="Dòng token streaming từ request tới phản hồi"></canvas>
+          <canvas id="signalCanvas" width="880" height="320" role="img" aria-label="Streaming token flow from request to response"></canvas>
           <div class="pipeline-labels" aria-hidden="true">
             <span>Input</span>
             <span>LLM</span>
@@ -139,7 +139,7 @@
             <p class="eyebrow">Model comparison</p>
             <h2>Latency and output</h2>
           </div>
-          <div class="comparison-table" role="table" aria-label="So sánh model">
+          <div class="comparison-table" role="table" aria-label="Model comparison">
             <div role="row" class="table-head">
               <span role="columnheader">Model</span>
               <span role="columnheader">Latency</span>

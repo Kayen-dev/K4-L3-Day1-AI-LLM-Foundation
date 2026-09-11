@@ -23,11 +23,12 @@ from template import (  # noqa: E402
 
 
 def _mock_reply(prompt: str, persona: str) -> str:
-    style = "ngắn gọn" if "ngắn" in persona.lower() else "rõ ràng"
+    style = "concise" if "concise" in persona.lower() else "clear"
     return (
-        f"Mình sẽ trả lời {style}: \"{prompt}\" được gửi kèm system prompt, "
-        "history gần nhất và tham số sampling. Phản hồi này mô phỏng streaming, "
-        "sau đó UI cập nhật token, chi phí và history 3 lượt cuối."
+        f"I will answer in a {style} style: \"{prompt}\" is sent with the system "
+        "prompt, recent history, and sampling settings. This response is streamed "
+        "in chunks, then the UI updates token count, estimated cost, and the last "
+        "three conversation turns."
     )
 
 
@@ -165,7 +166,7 @@ class DemoHandler(SimpleHTTPRequestHandler):
             _json_response(self, 400, {"error": "Invalid JSON"})
             return
 
-        prompt = str(payload.get("prompt", "")).strip() or "Giải thích token là gì."
+        prompt = str(payload.get("prompt", "")).strip() or "Explain what a token is."
         temperature = float(payload.get("temperature", 0.7))
         top_p = float(payload.get("topP", 0.9))
         max_tokens = int(payload.get("maxTokens", 256))
@@ -213,12 +214,12 @@ class DemoHandler(SimpleHTTPRequestHandler):
                 (
                     OPENAI_MODEL,
                     1.35 + len(prompt) / 260,
-                    "Phản hồi đầy đủ hơn, diễn giải kỹ các khái niệm và liên hệ tới sản phẩm thật.",
+                    "A more complete answer with deeper explanation and stronger product context.",
                 ),
                 (
                     OPENAI_MINI_MODEL,
                     0.48 + len(prompt) / 520,
-                    "Phản hồi ngắn hơn, nhanh hơn, phù hợp demo hoặc tác vụ đơn giản.",
+                    "A shorter and faster answer, useful for demos or simple production tasks.",
                 ),
             ]
             rows = [

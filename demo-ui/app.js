@@ -53,14 +53,14 @@ function estimateCost(prompt, response, model = "gpt-4o") {
 }
 
 function buildReply(prompt, persona) {
-  const tone = persona.toLowerCase().includes("ngắn") ? "ngắn gọn" : "rõ ràng";
+  const tone = persona.toLowerCase().includes("concise") ? "concise" : "clear";
   const creativity = Number(document.querySelector("#temperature").value);
   const style =
     creativity > 1.1
-      ? "mở rộng bằng ví dụ sáng tạo"
-      : "giữ cấu trúc chắc và dễ kiểm chứng";
+      ? "more exploratory and example-driven"
+      : "structured and easy to verify";
 
-  return `Mình sẽ trả lời ${tone}: "${prompt}" được gửi kèm system prompt, history gần nhất và tham số sampling. Với demo này, phản hồi được tách thành nhiều chunk để bạn thấy streaming xuất hiện dần, sau đó history chỉ giữ 3 lượt cuối. Cách triển khai nên ${style}.`;
+  return `I will answer in a ${tone} style: "${prompt}" is sent with the system prompt, recent history, and sampling settings. In this demo, the response is split into chunks so you can see streaming appear progressively. After the turn finishes, the app updates token count, estimated cost, and keeps only the last three turns. The implementation should stay ${style}.`;
 }
 
 function renderRuntimeStatus(label, mode = "mock") {
@@ -254,9 +254,9 @@ async function handleSend(event) {
 }
 
 function renderComparison() {
-  const prompt = promptInput.value.trim() || "Giải thích token là gì.";
-  const gpt4oResponse = "Phản hồi đầy đủ hơn, diễn giải kỹ các khái niệm và liên hệ tới sản phẩm thật.";
-  const miniResponse = "Phản hồi ngắn hơn, nhanh hơn, phù hợp demo hoặc tác vụ đơn giản.";
+  const prompt = promptInput.value.trim() || "Explain what a token is.";
+  const gpt4oResponse = "A more complete answer with deeper explanation and stronger product context.";
+  const miniResponse = "A shorter and faster answer, useful for demos or simple production tasks.";
   const rows = [
     {
       model: "gpt-4o",
@@ -289,7 +289,7 @@ function renderComparison() {
 }
 
 async function compareModels() {
-  const prompt = promptInput.value.trim() || "Giải thích token là gì.";
+  const prompt = promptInput.value.trim() || "Explain what a token is.";
   if (window.location.protocol === "file:") {
     renderComparison();
     return;
